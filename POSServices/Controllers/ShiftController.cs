@@ -26,31 +26,47 @@ namespace POSServices.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] ClosingShiftAPI transactionApi)
         {
-            CashierShift cashierShift = new CashierShift();
-            cashierShift.CashierShiftId = transactionApi.closingShiftId;
-            cashierShift.DeviceName = transactionApi.deviceName;
-            cashierShift.EmployeeCode = transactionApi.employeeId;
-            cashierShift.EmployeeName = transactionApi.employeeName;
-            cashierShift.OpeningTime = DateTime.Now;
-            cashierShift.OpeningBalance = transactionApi.openingTransBal;
-            cashierShift.ShiftCode = transactionApi.shiftCode;
-            cashierShift.ShiftName = transactionApi.shiftCode + " - " + transactionApi.employeeName;
-            cashierShift.ClosingBalance = transactionApi.closingTransBal;
-            cashierShift.StoreCode = transactionApi.storeCode;
-            cashierShift.StoreName = _context.Store.Where(c => c.Code == transactionApi.storeCode).First().Name;
-            cashierShift.ClosingTime = DateTime.Now;
-            _context.Add(cashierShift);
-            //log record
-            LogRecord log = new LogRecord();
-            log.TimeStamp = DateTime.Now;
-            log.Tag = "Closing Shift";
-            log.Message = JsonConvert.SerializeObject(transactionApi);
-            _context.LogRecord.Add(log);
-            _context.SaveChanges();
-            this.sequenceNumber(transactionApi);
+            APIResponse response = new APIResponse();
 
-            return Ok(cashierShift);
+            try
+            {
+                CashierShift cashierShift = new CashierShift();
+                cashierShift.CashierShiftId = transactionApi.closingShiftId;
+                cashierShift.DeviceName = transactionApi.deviceName;
+                cashierShift.EmployeeCode = transactionApi.employeeId;
+                cashierShift.EmployeeName = transactionApi.employeeName;
+                cashierShift.OpeningTime = Convert.ToDateTime(transactionApi.openingTimestamp);
+                cashierShift.OpeningBalance = transactionApi.openingTransBal;
+                cashierShift.ShiftCode = transactionApi.shiftCode;
+                cashierShift.ShiftName = transactionApi.shiftCode + " - " + transactionApi.employeeName;
+                cashierShift.ClosingBalance = transactionApi.closingTransBal;
+                cashierShift.StoreCode = transactionApi.storeCode;
+                cashierShift.StoreName = _context.Store.Where(c => c.Code == transactionApi.storeCode).First().Name;
+                cashierShift.ClosingTime = Convert.ToDateTime(transactionApi.closingTimestamp);
+                _context.Add(cashierShift);
+                //log record
+                LogRecord log = new LogRecord();
+                log.TimeStamp = DateTime.Now;
+                log.Tag = "Closing Shift";
+                log.Message = JsonConvert.SerializeObject(transactionApi);
+                _context.LogRecord.Add(log);
+                _context.SaveChanges();
+                this.sequenceNumber(transactionApi);
+
+                response.code = "1";
+                response.message = "Sucess Add Data";
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                response.code = "0";
+                response.message = e.ToString();
+
+                return BadRequest(response);
+            }            
         }
+
         private void sequenceNumber(ClosingShiftAPI transactionApi)
         {
 

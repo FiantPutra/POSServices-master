@@ -26,6 +26,8 @@ namespace POSServices.WebAPIBackendController
         {
             try
             {
+                object discountSetupStoreObj = new object();
+
                 var discountSetupStore = (from dss in _context.DiscountSetupStore.Where(x => x.DiscountId == discountSetupId)
                                           select new
                                           {
@@ -34,7 +36,18 @@ namespace POSServices.WebAPIBackendController
                                               DiscountId = dss.DiscountId
                                           }).ToList();
 
-                return Json(new[] { discountSetupStore });
+                if (discountSetupStore.Count > 0)
+                    discountSetupStoreObj = discountSetupStore;
+                else
+                    discountSetupStoreObj = "Data not found";
+
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = discountSetupStoreObj
+                });
             }
             catch (Exception ex)
             {

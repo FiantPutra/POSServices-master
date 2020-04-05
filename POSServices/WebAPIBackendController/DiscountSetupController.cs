@@ -26,18 +26,24 @@ namespace POSServices.WebAPIBackendController
         {
             try
             {
-                Object jsonObj = new object();
+                Object jsonObj = new object();                
 
                 if (status == 0)
                 {
-                    jsonObj = Json(new[] { getDiscountSetupInactive(discountType) });
+                    jsonObj = getDiscountSetupInactive(discountType);
                 }
                 else if (status == 1)
                 {
-                    jsonObj = Json(new[] { getDiscountSetupActive(discountType) });
+                    jsonObj = getDiscountSetupActive(discountType);
                 }
+               
 
-                return Json(new[] { jsonObj });
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = jsonObj
+                });                                
             }
             catch (Exception ex)
             {
@@ -54,6 +60,8 @@ namespace POSServices.WebAPIBackendController
         {
             try
             {
+                object discountSetupByIdObj = new object();
+
                 var discountSetupById = (from ds in _context.DiscountSetup.Where(x => x.Id == Id)
                                          select new
                                          {
@@ -65,18 +73,28 @@ namespace POSServices.WebAPIBackendController
                                              StartDate = ds.StartDate,
                                              EndDate = ds.EndDate,
                                              Status = ds.Status,
-                                             DiscountCash = ds.DiscountCash,
-                                             DiscountPercent = ds.DiscountPercent,
-                                             QtyMin = ds.QtyMin,
-                                             QtyMax = ds.QtyMax,
-                                             AmountMin = ds.AmountMin,
-                                             AmountMax = ds.AmountMax,
-                                             ApprovedDate = ds.ApprovedDate,
-                                             Multi = ds.Multi,
+                                             DiscountCash = ds.DiscountCash != null ? ds.DiscountCash : 0,
+                                             DiscountPercent = ds.DiscountPercent != null ? ds.DiscountPercent : 0,
+                                             QtyMin = ds.QtyMin != null ? ds.QtyMin : 0,
+                                             QtyMax = ds.QtyMax != null ? ds.QtyMax : 0,
+                                             AmountMin = ds.AmountMin != null ? ds.AmountMin : 0,
+                                             AmountMax = ds.AmountMax != null ? ds.AmountMax : 0,
+                                             ApprovedDate = ds.ApprovedDate != null ? ds.ApprovedDate : DateTime.MinValue,
+                                             Multi = ds.Multi != null ? ds.Multi : 0,
                                              DiscountSetupId = ds.Id
                                          }).ToList();
 
-                return Json(new[] { discountSetupById });
+                if (discountSetupById.Count > 0)
+                    discountSetupByIdObj = discountSetupById;
+                else
+                    discountSetupByIdObj = "Data not found";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = discountSetupByIdObj
+                });
             }
             catch (Exception ex)
             {
@@ -249,6 +267,8 @@ namespace POSServices.WebAPIBackendController
 
         public Object getDiscountSetupInactive(int discountType)
         {
+            object discountSetupObj = new object();
+
             var discountSetup = (from ds in _context.DiscountSetup.Where(x => x.DiscountType == discountType
                                  && (x.StartDate > DateTime.Today && x.EndDate > DateTime.Today || x.StartDate < DateTime.Today && x.EndDate < DateTime.Today))
                                  select new
@@ -261,22 +281,29 @@ namespace POSServices.WebAPIBackendController
                                      StartDate = ds.StartDate,
                                      EndDate = ds.EndDate,
                                      Status = ds.Status,
-                                     DiscountCash = ds.DiscountCash,
-                                     DiscountPercent = ds.DiscountPercent,
-                                     QtyMin = ds.QtyMin,
-                                     QtyMax = ds.QtyMax,
-                                     AmountMin = ds.AmountMin,
-                                     AmountMax = ds.AmountMax,
-                                     ApprovedDate = ds.ApprovedDate,
-                                     Multi = ds.Multi,
+                                     DiscountCash = ds.DiscountCash != null ? ds.DiscountCash : 0,
+                                     DiscountPercent = ds.DiscountPercent != null ? ds.DiscountPercent : 0,
+                                     QtyMin = ds.QtyMin != null ? ds.QtyMin : 0,
+                                     QtyMax = ds.QtyMax != null ? ds.QtyMax : 0,
+                                     AmountMin = ds.AmountMin != null ? ds.AmountMin : 0,
+                                     AmountMax = ds.AmountMax != null ? ds.AmountMax : 0,
+                                     ApprovedDate = ds.ApprovedDate != null ? ds.ApprovedDate : DateTime.MinValue,
+                                     Multi = ds.Multi != null ? ds.Multi : 0,
                                      DiscountSetupId = ds.Id
                                  }).ToList();
 
-            return discountSetup;
+            if (discountSetup.Count > 0)
+                discountSetupObj = discountSetup;
+            else
+                discountSetupObj = "Data not found";
+
+            return discountSetupObj;
         }
 
         public Object getDiscountSetupActive(int discountType)
         {
+            object discountSetupObj = new object();
+
             var discountSetup = (from ds in _context.DiscountSetup.Where(x => x.DiscountType == discountType
                                  && x.StartDate < DateTime.Today && x.EndDate > DateTime.Today)
                                  select new
@@ -289,18 +316,23 @@ namespace POSServices.WebAPIBackendController
                                      StartDate = ds.StartDate,
                                      EndDate = ds.EndDate,
                                      Status = ds.Status,
-                                     DiscountCash = ds.DiscountCash,
-                                     DiscountPercent = ds.DiscountPercent,
-                                     QtyMin = ds.QtyMin,
-                                     QtyMax = ds.QtyMax,
-                                     AmountMin = ds.AmountMin,
-                                     AmountMax = ds.AmountMax,
-                                     ApprovedDate = ds.ApprovedDate,
-                                     Multi = ds.Multi,
+                                     DiscountCash = ds.DiscountCash != null ? ds.DiscountCash : 0,
+                                     DiscountPercent = ds.DiscountPercent != null ? ds.DiscountPercent : 0,
+                                     QtyMin = ds.QtyMin != null ? ds.QtyMin : 0,
+                                     QtyMax = ds.QtyMax != null ? ds.QtyMax : 0,
+                                     AmountMin = ds.AmountMin != null ? ds.AmountMin : 0,
+                                     AmountMax = ds.AmountMax != null ? ds.AmountMax : 0,
+                                     ApprovedDate = ds.ApprovedDate != null ? ds.ApprovedDate : DateTime.MinValue,
+                                     Multi = ds.Multi != null ? ds.Multi : 0,
                                      DiscountSetupId = ds.Id
                                  }).ToList();
 
-            return discountSetup;
+            if (discountSetup.Count > 0)
+                discountSetupObj = discountSetup;
+            else
+                discountSetupObj = "Data not found";
+
+            return discountSetupObj;
         }        
     }
 }

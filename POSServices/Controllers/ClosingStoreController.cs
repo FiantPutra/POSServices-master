@@ -39,6 +39,7 @@ namespace POSServices.Controllers
                 closeStore.DeviceName = transactionApi.deviceName;
                 closeStore.DisputePettyCash = transactionApi.disputePettyCash;
                 closeStore.DisputeTransBal = transactionApi.disputeTransBal;
+                closeStore.DisputeDeposit = transactionApi.disputeDeposit;
                 closeStore.EmployeeId = transactionApi.employeeId;
                 closeStore.EmployeeName = transactionApi.employeeName;
                 closeStore.OpeningDeposit = transactionApi.openingDeposit;

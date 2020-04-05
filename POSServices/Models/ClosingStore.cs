@@ -26,5 +26,5 @@ namespace POSServices.Models
         public string EmployeeName { get; set; }
         public string DeviceName { get; set; }
         public string StatusClose { get; set; }
-    }
+    }    
 }

@@ -22,11 +22,13 @@ namespace POSServices.WebAPIBackendController
         }
 
         [HttpGet]
-        public async Task<IActionResult> getDownloadSession(int JobId)
+        public async Task<IActionResult> getDownloadSession(String StoreId)
         {
             try
             {
-                var downloadSession = (from ds in _context.JobTabletoSynchDetailDownload.Where(x => x.JobId == JobId)
+                object downloadSessionObj = new object();
+
+                var downloadSession = (from ds in _context.JobTabletoSynchDetailDownload.Where(x => x.StoreId == StoreId).OrderByDescending(x => x.SynchDetail).Take(100)
                                        select new
                                        {
                                            SyncDetail = ds.SynchDetail,
@@ -37,7 +39,17 @@ namespace POSServices.WebAPIBackendController
                                            JobId = ds.JobId
                                        }).ToList();
 
-                return Json(new[] { downloadSession });
+                if (downloadSession.Count > 0)
+                    downloadSessionObj = downloadSession;
+                else
+                    downloadSessionObj = "Data not found";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = downloadSessionObj
+                });
             }
             catch (Exception ex)
             {
@@ -50,14 +62,16 @@ namespace POSServices.WebAPIBackendController
         }
 
         [HttpGet("Status")]
-        public async Task<IActionResult> getDownloadSessionStatus(int JobId)
+        public async Task<IActionResult> getDownloadSessionStatus(String StoreId)
         {
             try
             {
-                var downloadSessionStatus = (from ds in _context.JobTabletoSynchDetailDownload
+                object downloadSessionStatusObj = new object();
+
+                var downloadSessionStatus = (from ds in _context.JobTabletoSynchDetailDownload.OrderByDescending(x => x.SynchDetail).Take(100)
                                              join dst in _context.JobSynchDetailDownloadStatus
                                              on ds.SynchDetail equals dst.SynchDetail
-                                             where ds.JobId == JobId
+                                             where ds.StoreId == StoreId
                                              select new
                                              {
                                                  SyncDetail = ds.SynchDetail,
@@ -69,7 +83,17 @@ namespace POSServices.WebAPIBackendController
                                                  Status = dst.Status
                                              }).ToList();
 
-                return Json(new[] { downloadSessionStatus });
+                if (downloadSessionStatus.Count > 0)
+                    downloadSessionStatusObj = downloadSessionStatus;
+                else
+                    downloadSessionStatusObj = "Data not found";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = downloadSessionStatusObj
+                });
             }
             catch (Exception ex)
             {

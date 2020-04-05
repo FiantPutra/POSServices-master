@@ -26,21 +26,33 @@ namespace POSServices.WebAPIBackendController
         {
             try
             {
+                object discountSetupLineObj = new object();
+
                 var discountSetupLine = (from dsl in _context.DiscountSetupLines.Where(x => x.DiscountSetupId == discountSetupId)
                                          select new
                                          {                                             
                                              GroupCode = dsl.GroupCode,
                                              Code = dsl.Code,
-                                             DiscountPercent = dsl.DiscountPrecentage,
-                                             DiscountCash = dsl.DiscountCash,
-                                             QtyMin = dsl.QtyMin,
-                                             QtyMax = dsl.QtyMax,
-                                             AmountMin = dsl.AmountMin,
-                                             AmountMax = dsl.AmountMax,                                             
-                                             Multi = dsl.Multi
+                                             DiscountPercent = dsl.DiscountPrecentage != null ? dsl.DiscountPrecentage : 0,
+                                             DiscountCash = dsl.DiscountCash != null ? dsl.DiscountCash : 0,
+                                             QtyMin = dsl.QtyMin != null ? dsl.QtyMin : 0,
+                                             QtyMax = dsl.QtyMax != null ? dsl.QtyMax : 0,
+                                             AmountMin = dsl.AmountMin != null ? dsl.AmountMin : 0,
+                                             AmountMax = dsl.AmountMax != null ? dsl.AmountMax : 0,                                             
+                                             Multi = dsl.Multi != null ? dsl.Multi : 0
                                          }).ToList();
 
-                return Json(new[] { discountSetupLine });
+                if (discountSetupLine.Count > 0)
+                    discountSetupLineObj = discountSetupLine;
+                else
+                    discountSetupLineObj = "Data not found";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = discountSetupLineObj
+                });
             }
             catch (Exception ex)
             {

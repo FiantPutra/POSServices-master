@@ -26,7 +26,9 @@ namespace POSServices.WebAPIBackendController
         {
             try
             {
-                var jobList = (from job in _context.Job.Where(x => x.Erpjob == erpJob)
+                object jobListObj = new object();
+
+                var jobList = (from job in _context.Job.Where(x => x.Erpjob == erpJob).OrderByDescending(x => x.JobId).Take(100)
                                select new
                                {
                                    Description = job.Description,
@@ -39,7 +41,17 @@ namespace POSServices.WebAPIBackendController
                                    JobId = job.JobId
                                }).ToList();
 
-                return Json(jobList);
+                if (jobList.Count > 0)
+                    jobListObj = jobList;
+                else
+                    jobListObj = "Data not found";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = jobListObj
+                });                
             }
             catch (Exception ex)
             {

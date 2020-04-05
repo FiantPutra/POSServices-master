@@ -22,11 +22,13 @@ namespace POSServices.WebAPIBackendController
         }
 
         [HttpGet]
-        public async Task<IActionResult> getUploadSession(int JobId)
+        public async Task<IActionResult> getUploadSession(String StoreId)
         {
             try
             {
-                var uploadSession = (from us in _context.JobTabletoSynchDetailUpload.Where(x => x.JobId == JobId)
+                object uploadSessionObj = new object();
+
+                var uploadSession = (from us in _context.JobTabletoSynchDetailUpload.Where(x => x.StoreId == StoreId).OrderByDescending(x => x.SynchDetail).Take(100)
                                        select new
                                        {
                                            SyncDetail = us.SynchDetail,
@@ -34,10 +36,23 @@ namespace POSServices.WebAPIBackendController
                                            TableName = us.TableName,
                                            SyncDate = us.Synchdate,
                                            rowFatch = us.RowFatch,
+                                           rowApplied = us.RowApplied,
+                                           status = us.Status,
                                            JobId = us.JobId
                                        }).ToList();
 
-                return Json(new[] { uploadSession });
+                if (uploadSession.Count > 0)
+                    uploadSessionObj = uploadSession;
+                else
+                    uploadSessionObj = "Data not foud";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = uploadSessionObj
+
+                });
             }
             catch (Exception ex)
             {
@@ -50,14 +65,16 @@ namespace POSServices.WebAPIBackendController
         }
 
         [HttpGet("Status")]
-        public async Task<IActionResult> getUploadSessionStatus(int JobId)
+        public async Task<IActionResult> getUploadSessionStatus(String StoreId)
         {
             try
             {
-                var uploadSessionStatus = (from us in _context.JobTabletoSynchDetailUpload
+                object uploadSessionStatusObj = new object();
+
+                var uploadSessionStatus = (from us in _context.JobTabletoSynchDetailUpload.OrderByDescending(x => x.SynchDetail).Take(100)
                                              join ust in _context.JobSynchDetailUploadStatus
                                              on us.SynchDetail equals ust.SynchDetail
-                                             where us.JobId == JobId
+                                             where us.StoreId == StoreId 
                                              select new
                                              {
                                                  SyncDetail = us.SynchDetail,
@@ -69,7 +86,18 @@ namespace POSServices.WebAPIBackendController
                                                  Status = ust.Status
                                              }).ToList();
 
-                return Json(new[] { uploadSessionStatus });
+                if (uploadSessionStatus.Count > 0)
+                    uploadSessionStatusObj = uploadSessionStatus;
+                else
+                    uploadSessionStatusObj = "Data not found";
+
+                return StatusCode(1, new
+                {
+                    status = "1",
+                    message = "Success",
+                    data = uploadSessionStatusObj
+
+                });
             }
             catch (Exception ex)
             {

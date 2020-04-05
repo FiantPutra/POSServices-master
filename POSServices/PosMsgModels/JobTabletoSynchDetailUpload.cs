@@ -13,6 +13,8 @@ namespace POSServices.PosMsgModels
         public DateTime Synchdate { get; set; }
         public string CreateTable { get; set; }
         public int? RowFatch { get; set; }
+        public int? RowApplied { get; set; }
+        public int? Status { get; set; }
     }
 
     public class syncUploadDetail
